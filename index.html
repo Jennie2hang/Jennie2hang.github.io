@@ -190,7 +190,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/" class="post-title-link" itemprop="url">多种SSL_Pinning校验逻辑</a>
+          <a href="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/" class="post-title-link" itemprop="url">多种SSL Pinning校验逻辑</a>
         </h2>
 
         <div class="post-meta-container">
@@ -202,7 +202,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2025-04-25 18:18:09 / Modified: 22:17:07" itemprop="dateCreated datePublished" datetime="2025-04-25T18:18:09+08:00">2025-04-25</time>
+      <time title="Created: 2025-04-25 18:18:09 / Modified: 22:38:49" itemprop="dateCreated datePublished" datetime="2025-04-25T18:18:09+08:00">2025-04-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -225,69 +225,14 @@
     
     <div class="post-body" itemprop="articleBody">
           <h2 id="SSL-Pinning校验"><a href="#SSL-Pinning校验" class="headerlink" title="SSL Pinning校验"></a>SSL Pinning校验</h2><p>一个证书包含了很多信息，那么客户端校验的原理就是，在App中预先设置好证书的信息，在证书校验阶段时，与服务器返回的证书信息进行比较。</p>
-<h3 id="客户端证书校验"><a href="#客户端证书校验" class="headerlink" title="客户端证书校验"></a>客户端证书校验</h3><h4 id="公钥校验"><a href="#公钥校验" class="headerlink" title="公钥校验"></a>公钥校验</h4><p>简单来说，就是客户端从服务器证书链中提取出公钥，做 hash（通常是 SHA256），然后和本地 hardcode 的值进行比对，一致才建立连接，否则就断开。</p>
-<p>以Charles证书为例，如果我们想要提取公钥：</p>
-<p><code>openssl x509 -in your.pem -noout -pubkey</code></p>
-<p><img src="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/image-20250425195242994.png" alt="image-20250425195242994"></p>
-<p>如果.pem文件中有多个证书，我们也可以提取每个证书为单独的.pem文件</p>
-<p><code>csplit -f cert- -b &quot;%02d.pem&quot; your.pem &#39;/-----BEGIN CERTIFICATE-----/&#39; &#39;&#123;*&#125;&#39;</code></p>
-<p>想提取SHA256指纹，</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -<span class="keyword">in</span> cert-00.pem -pubkey -noout | \</span><br><span class="line">openssl rsa -pubin -outform der 2&gt;/dev/null | \</span><br><span class="line">openssl dgst -sha256 -binary | \</span><br><span class="line">openssl enc -<span class="built_in">base64</span></span><br></pre></td></tr></table></figure>
-
-<p>在有公钥校验的情况下，Charles没有办法直接抓包，因为Charles 的SSL证书被拒绝</p>
-<p><img src="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/image-20250425195828103-5582311.png" alt="image-20250425195828103-5582311"></p>
-<p>在开发阶段，公钥校验的代码一般来说是使用不同的网络请求框架，比较常见的就是okhttp3</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="type">String</span> <span class="variable">CA_DOMAIN</span> <span class="operator">=</span> <span class="string">&quot;www.baidu.com&quot;</span>;</span><br><span class="line">                <span class="comment">//获取公钥：</span></span><br><span class="line">                <span class="comment">//openssl s_client -connect www.baidu.com:443 -servername www.baidu.com | openssl x509 -pubkey -noout | openssl rsa -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64</span></span><br><span class="line">                <span class="keyword">final</span> <span class="type">String</span> <span class="variable">CA_PUBLIC_KEY</span> <span class="operator">=</span> <span class="string">&quot;sha256/Zhv4cvwdHmEmE0edWEcIdmLfwsqxrrOmp+vbngwNnrU=&quot;</span>;</span><br><span class="line">                <span class="type">CertificatePinner</span> <span class="variable">pinner</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CertificatePinner</span>.Builder()</span><br><span class="line">                        .add(CA_DOMAIN,CA_PUBLIC_KEY)</span><br><span class="line">                        .build();</span><br><span class="line">                <span class="type">OkHttpClient</span> <span class="variable">client</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OkHttpClient</span>().newBuilder().certificatePinner(pinner).build();</span><br><span class="line">                <span class="type">Request</span> <span class="variable">request</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Request</span>.Builder()</span><br><span class="line">                        .url(<span class="string">&quot;https://www.baidu.com&quot;</span>)</span><br><span class="line">                        .build();</span><br></pre></td></tr></table></figure>
-
-<p><strong><u>想要绕过，就是检查证书的校验逻辑，并使其失效，这一内容在上一篇中讲过，不再赘述。</u></strong></p>
-<h4 id="证书校验"><a href="#证书校验" class="headerlink" title="证书校验"></a>证书校验</h4><p>这种校验方法会将证书内置在app的资源文件目录下。</p>
-<p><img src="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/image-20250425200430998.png" alt="image-20250425200430998"></p>
-<p>其校验的核心逻辑在于APP自定义的<code>trustManager</code> 类实现的<code>checkServerTrusted</code>接口</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HttpsTrustAllCerts</span> <span class="keyword">implements</span> <span class="title class_">X509TrustManager</span> &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">checkClientTrusted</span><span class="params">(X509Certificate[] x509Certificates, String s)</span> <span class="keyword">throws</span> CertificateException &#123;</span><br><span class="line">			...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">checkServerTrusted</span><span class="params">(X509Certificate[] x509Certificates, String s)</span> <span class="keyword">throws</span> CertificateException &#123;</span><br><span class="line">			...	</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>相较于公钥验证，证书验证的难点在于App使用的是自定义的类，无法直接确认类名。</p>
-<p>但是也不是没有突破口。</p>
-<p>我们通过自定义 TrustManager 实现了证书校验逻辑，而这个逻辑的实际生效依赖于通过 SSLSocketFactory 创建的 TLS 通道。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">SSLSocketFactory</span> <span class="variable">sSLSocketFactory</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="type">SSLContext</span> <span class="variable">sc</span> <span class="operator">=</span> SSLContext.getInstance(<span class="string">&quot;TLS&quot;</span>);</span><br><span class="line">    sc.init(<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">TrustManager</span>[]&#123;<span class="keyword">new</span> <span class="title class_">HttpsTrustAllCerts</span>()&#125;,<span class="keyword">new</span> <span class="title class_">SecureRandom</span>());</span><br><span class="line">    sSLSocketFactory = sc.getSocketFactory();</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> sSLSocketFactory;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>然后通过以下代码绑定会话</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">OkHttpClient</span> <span class="variable">mClient</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OkHttpClient</span>().newBuilder()</span><br><span class="line">  .sslSocketFactory(HttpsTrustAllCerts.createSSLSocketFactory(),<span class="keyword">new</span> <span class="title class_">HttpsTrustAllCerts</span>())</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>因此，我们的绕过逻辑可以是：<strong>通过替换 TrustManager 实现绕过证书校验</strong></p>
-<p>首先定义一个自定义的 X509TrustManager 实现类，该类中不执行任何证书校验（即默认信任所有证书）。然后，在运行时通过 hook 拦截 TLS 初始化的关键位置，将这个空实现的 TrustManager 注入进去，从而实现对系统证书校验逻辑的完全绕过。</p>
-<p>可参考如下的 Frida 脚本：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> X509TrustManager = <span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&#x27;javax.net.ssl.X509TrustManager&#x27;</span>);</span><br><span class="line">        <span class="keyword">var</span> <span class="title class_">SSLContext</span> = <span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&#x27;javax.net.ssl.SSLContext&#x27;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// TrustManager (Android &lt; 7) //</span></span><br><span class="line">        <span class="comment">////////////////////////////////</span></span><br><span class="line">        <span class="keyword">var</span> <span class="title class_">TrustManager</span> = <span class="title class_">Java</span>.<span class="title function_">registerClass</span>(&#123;</span><br><span class="line">            <span class="comment">// Implement a custom TrustManager</span></span><br><span class="line">            <span class="attr">name</span>: <span class="string">&#x27;dev.asd.test.TrustManager&#x27;</span>,</span><br><span class="line">            <span class="attr">implements</span>: [X509TrustManager],</span><br><span class="line">            <span class="attr">methods</span>: &#123;</span><br><span class="line">                <span class="attr">checkClientTrusted</span>: <span class="keyword">function</span>(<span class="params">chain, authType</span>) &#123;&#125;,</span><br><span class="line">                <span class="attr">checkServerTrusted</span>: <span class="keyword">function</span>(<span class="params">chain, authType</span>) &#123;&#125;,</span><br><span class="line">                <span class="attr">getAcceptedIssuers</span>: <span class="keyword">function</span>(<span class="params"></span>) &#123;<span class="keyword">return</span> []; &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">// Prepare the TrustManager array to pass to SSLContext.init()</span></span><br><span class="line">        <span class="keyword">var</span> <span class="title class_">TrustManagers</span> = [<span class="title class_">TrustManager</span>.$new()];</span><br><span class="line">        <span class="comment">// Get a handle on the init() on the SSLContext class</span></span><br><span class="line">        <span class="keyword">var</span> <span class="title class_">SSLContext</span>_init = <span class="title class_">SSLContext</span>.<span class="property">init</span>.<span class="title function_">overload</span>(</span><br><span class="line">            <span class="string">&#x27;[Ljavax.net.ssl.KeyManager;&#x27;</span>, <span class="string">&#x27;[Ljavax.net.ssl.TrustManager;&#x27;</span>, <span class="string">&#x27;java.security.SecureRandom&#x27;</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// Override the init method, specifying the custom TrustManager</span></span><br><span class="line">            <span class="title class_">SSLContext</span>_init.<span class="property">implementation</span> = <span class="keyword">function</span>(<span class="params">keyManager, trustManager, secureRandom</span>) &#123;</span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;[+] Bypassing Trustmanager (Android &lt; 7) pinner&#x27;</span>);</span><br><span class="line">                <span class="title class_">SSLContext</span>_init.<span class="title function_">call</span>(<span class="variable language_">this</span>, keyManager, <span class="title class_">TrustManagers</span>, secureRandom);</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;[-] TrustManager (Android &lt; 7) pinner not found&#x27;</span>);</span><br><span class="line">            <span class="comment">//console.log(err);</span></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="Host校验"><a href="#Host校验" class="headerlink" title="Host校验"></a>Host校验</h4><ul>
-<li>一张服务器证书是多域名证书（即支持多个 SAN：Subject Alternative Names）</li>
-<li>理论上这张证书可以给多个域名提供 HTTPS 服务（比如 CDN 场景）</li>
-<li>但 App 开发者希望：</li>
-</ul>
-<p>​	<strong>虽然证书合法，但客户端只能请求特定域名</strong></p>
-<p>否则即使证书通过校验，App 也会拒绝连接</p>
-<p>在okhttp中</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">OkHttpClient</span> <span class="variable">client</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OkHttpClient</span>.Builder()</span><br><span class="line">    .hostnameVerifier(<span class="keyword">new</span> <span class="title class_">HostnameVerifier</span>() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">verify</span><span class="params">(String hostname, SSLSession session)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;api.example.com&quot;</span>.equals(hostname);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    .build();</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>绕过方式和证书校验思路一样 自己创建一个HostnameVerifier类实现的接口直接返回true，哪里调用传给哪里即可</li>
-</ul>
-<h3 id="服务端证书校验"><a href="#服务端证书校验" class="headerlink" title="服务端证书校验"></a>服务端证书校验</h3><p>在客户端放入证书（p12&#x2F;bks），客户端向服务端发送请求时，携带证书信息，在服务端会校验客户端携带过来的证书合法性</p>
-<p>开发逻辑</p>
-<ul>
-<li>在APK打包时，将证书放入assets或raw目录</li>
-<li>在开发代码时，发送请求读取证书文件内容+证书密码 携带发送到服务器端</li>
-</ul>
-<p>这个时候如果想要抓包成功，那么就需要charles利用客户端的证书来转发内容，进而完成抓包。</p>
-<p>（此处，待案例补充……）</p>
-<h3 id="禁用代理"><a href="#禁用代理" class="headerlink" title="禁用代理"></a>禁用代理</h3><p>现在的很多的app都是用禁止网络代理来防止抓包。在请求的时候都使用了Proxy.NO_PROXY</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">OkHttpClient</span> <span class="variable">client</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OkHttpClient</span>().newBuilder().proxy(Proxy.NO_PROXY).build();</span><br><span class="line"></span><br><span class="line">----------------------------------</span><br><span class="line">  </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">Proxy</span> <span class="variable">NO_PROXY</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Proxy</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// Creates the proxy that represents a &#123;@code DIRECT&#125; connection.</span></span><br><span class="line"><span class="keyword">private</span> <span class="title function_">Proxy</span><span class="params">()</span> &#123;</span><br><span class="line">    type = Type.DIRECT;</span><br><span class="line">    sa = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Java中这么配置，说明它表示<strong>无论全局设置如何，都应尝试直接连接（即不通过任何http代理）。</strong></p>
-<p>解决方法：传输层的vpn进行流量转发</p>
-<p>Postern 是基于 Android 的 <strong>VPNService 接口</strong> 实现的“用户态透明代理”，它不是依赖应用设置代理协议，而是从系统层面<strong>截获所有 TCP&#x2F;UDP 流量</strong>，然后根据规则<strong>转发给不同类型的代理服务器</strong>（HTTP、SOCKS5、Shadowsocks、SS-TLS 等），所以它<strong>可以代理任意协议的连接请求，而不局限于 HTTP&#x2F;HTTPS。</strong></p>
-<p>（此处，待案例补充……）</p>
-<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1809966-1-1.html">https://www.52pojie.cn/thread-1809966-1-1.html</a></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -349,7 +294,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-04-25 22:35:31" itemprop="dateModified" datetime="2025-04-25T22:35:31+08:00">2025-04-25</time>
+      <time title="Modified: 2025-04-25 22:38:32" itemprop="dateModified" datetime="2025-04-25T22:38:32+08:00">2025-04-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -371,10 +316,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>HTTPS在HTTP的基础上增加了TLS加密，即便如此HTTPS并不安全，依然存在被中间人攻击（Man-in-the-Middle Attack）的风险，进而导致应用被抓包，HTTPS的加密流量被获取。</p>
-<h3 id="Man-in-the-Middle"><a href="#Man-in-the-Middle" class="headerlink" title="Man-in-the-Middle"></a>Man-in-the-Middle</h3><p>什么是MITM呢？简单来说就是A和B要通信，此时出现一个第三者C， C告诉A自己是B，告诉B自己是A。这样A和B都以为自己在和对方通信，但实际上看到的信息都是由C转发的。C在这个过程中，就可以完成对A和B通信的篡改。比较典型的MITM场景就是网络中的ARP欺骗。</p>
-<p>而HTTPS在设计的时候，是考虑到了MITM的场景的。TLS是需要双向认证身份的。<em><u>那为什么还会遇到MITM攻击呢？</u></em></p>
-<p>因为TLS的认证是基于证书的，但是<u>我们信任的一定是我们应该信任的证书吗？</u></p>
+          <p>**SSL Pinning 是一种安全技术，用于防止 App 遭受中间人攻击（MITM）或被抓包。**它通过将服务器的证书或公钥“写死”在 App 中，在每次建立 HTTPS 连接时进行强制校验，只有校验通过才允许通信。正因如此，SSL Pinning 对 Android 上的代理抓包工具（如 Charles、Fiddler 等）构成了有效阻碍。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2025/04/24/SSL_Pinning%E5%88%9D%E8%AF%86/#more" rel="contents">
