@@ -208,7 +208,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-04-25 16:57:25" itemprop="dateModified" datetime="2025-04-25T16:57:25+08:00">2025-04-25</time>
+      <time title="Modified: 2025-04-25 16:58:35" itemprop="dateModified" datetime="2025-04-25T16:58:35+08:00">2025-04-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -282,7 +282,7 @@
 <p>针对OKHTTP的证书绑定而言<code>check</code>函数会调用<code>java.io.File</code>打开根证书，还会调用<code>android.security.net.config.RootTrustManager.checkServerTrusted</code>和<code>com.android.org.conscrypt.TrustManagerImpl.checkTrusted</code>等函数，所以可以通过hook这些函数中的任意一个函数回溯找到<code>check</code>函数。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&quot;android.security.net.config.RootTrustManager&quot;</span>).<span class="property">checkServerTrusted</span>.<span class="title function_">overload</span>(<span class="string">&#x27;[Ljava.security.cert.X509Certificate;&#x27;</span>, <span class="string">&#x27;java.lang.String&#x27;</span>, <span class="string">&#x27;java.net.Socket&#x27;</span>).<span class="property">implementation</span> = <span class="keyword">function</span>(<span class="params">arg0, arg1, arg2</span>)&#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&quot;android.util.Log&quot;</span>).<span class="title function_">getStackTraceString</span>(<span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&quot;java.lang.Throwable&quot;</span>).$new()));</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="title function_">checkServerTrusted</span>(arg0, arg1, arg2)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/endpoint/341407.html">https://www.freebuf.com/articles/endpoint/341407.html</a></p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/endpoint/341407.html">https://www.freebuf.com/articles/endpoint/341407.html</a></p>
 <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/revercc/p/16901272.html">https://www.cnblogs.com/revercc/p/16901272.html</a></p>
 
       
