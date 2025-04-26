@@ -19,22 +19,35 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"jennie2hang.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Jennie&#39; Blog">
-<meta property="og:url" content="https://jennie2hang.github.io/index.html">
+    <meta name="description" content="Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。 flutter中的SSL PinningFlutter">
+<meta property="og:type" content="article">
+<meta property="og:title" content="针对flutter的抓包方法">
+<meta property="og:url" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="Jennie&#39; Blog">
+<meta property="og:description" content="Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。 flutter中的SSL PinningFlutter">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426180918094.png">
+<meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426221128513.png">
+<meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/zhangdongni/my_space/blogs/hexo-blog/source/_posts/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426221232407.png">
+<meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426224656836.png">
+<meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250427003154170.png">
+<meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250427004129426.png">
+<meta property="article:published_time" content="2025-04-25T16:18:29.000Z">
+<meta property="article:modified_time" content="2025-04-26T16:41:45.161Z">
 <meta property="article:author" content="piupiu">
+<meta property="article:tag" content="Android 协议">
+<meta property="article:tag" content="flutter">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426180918094.png">
 
 
-<link rel="canonical" href="https://jennie2hang.github.io/">
+<link rel="canonical" href="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"en","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/","path":"2025/04/26/针对flutter的抓包方法/","title":"针对flutter的抓包方法"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Jennie' Blog</title>
+<title>针对flutter的抓包方法 | Jennie' Blog</title>
   
 
 
@@ -84,7 +97,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">Jennie' Blog</h1>
+      <p class="site-title">Jennie' Blog</p>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -110,7 +123,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -123,6 +136,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#flutter%E4%B8%AD%E7%9A%84SSL-Pinning"><span class="nav-number">1.</span> <span class="nav-text">flutter中的SSL Pinning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%93%E5%8C%85Flutter-App"><span class="nav-number">2.</span> <span class="nav-text">抓包Flutter App</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E8%AF%9D"><span class="nav-number">3.</span> <span class="nav-text">后话</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">4.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -162,16 +176,17 @@
 
     </div>
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
     <link itemprop="mainEntityOfPage" href="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -185,13 +200,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Jennie' Blog">
+      <meta itemprop="name" content="针对flutter的抓包方法 | Jennie' Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">针对flutter的抓包方法</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          针对flutter的抓包方法
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -220,8 +235,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
-          <p>Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。</p>
+    <div class="post-body" itemprop="articleBody"><p>Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。</p>
 <h2 id="flutter中的SSL-Pinning"><a href="#flutter中的SSL-Pinning" class="headerlink" title="flutter中的SSL Pinning"></a>flutter中的SSL Pinning</h2><p>Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。在网络连接方面，Dart 并不会默认信任操作系统中已安装的根证书，它会使用Google的<a target="_blank" rel="noopener" href="https://github.com/google/boringssl">BoringSSL</a>来处理与SSL相关的所有内容。这使得在 Dart 中抓包 HTTPS 请求更加复杂，因为我们不能以将代理的证书（如 Charles 的根证书） 添加到系统证书的方式来绕过SSL验证。</p>
 <ol>
 <li><p><strong>Dart语言标准库的网络请求不走Wi-Fi代理</strong>：Flutter使用的是Dart语言，其标准库中的网络请求不会通过代理发送，这与许多其他应用不同。常规的抓包工具通常依赖于代理来捕获网络流量，因此无法捕获Flutter应用的网络请求。</p>
@@ -294,7 +308,6 @@
 <p><a target="_blank" rel="noopener" href="https://blog.nviso.eu/2020/05/20/intercepting-flutter-traffic-on-android-x64/">https://blog.nviso.eu/2020/05/20/intercepting-flutter-traffic-on-android-x64/</a></p>
 <p><a target="_blank" rel="noopener" href="https://github.com/NVISOsecurity/blogposts/tree/master/flutter-testapps">https://github.com/NVISOsecurity/blogposts/tree/master/flutter-testapps</a></p>
 
-      
     </div>
 
     
@@ -302,189 +315,26 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
+          <div class="post-tags">
+              <a href="/tags/Android-%E5%8D%8F%E8%AE%AE/" rel="tag"># Android 协议</a>
+              <a href="/tags/flutter/" rel="tag"># flutter</a>
+          </div>
 
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://jennie2hang.github.io/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="piupiu">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jennie' Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Jennie' Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/" class="post-title-link" itemprop="url">多种SSL Pinning校验逻辑</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2025-04-25 18:18:09 / Modified: 22:38:49" itemprop="dateCreated datePublished" datetime="2025-04-25T18:18:09+08:00">2025-04-25</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Android-%E9%80%86%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">Android 逆向</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="SSL-Pinning校验"><a href="#SSL-Pinning校验" class="headerlink" title="SSL Pinning校验"></a>SSL Pinning校验</h2><p>一个证书包含了很多信息，那么客户端校验的原理就是，在App中预先设置好证书的信息，在证书校验阶段时，与服务器返回的证书信息进行比较。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://jennie2hang.github.io/2025/04/24/SSL_Pinning%E5%88%9D%E8%AF%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="piupiu">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jennie' Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Jennie' Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2025/04/24/SSL_Pinning%E5%88%9D%E8%AF%86/" class="post-title-link" itemprop="url">SSL Pinning初识</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2025-04-24 20:43:05" itemprop="dateCreated datePublished" datetime="2025-04-24T20:43:05+08:00">2025-04-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-04-25 22:41:54" itemprop="dateModified" datetime="2025-04-25T22:41:54+08:00">2025-04-25</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Android-%E9%80%86%E5%90%91/" itemprop="url" rel="index"><span itemprop="name">Android 逆向</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>SSL Pinning 是一种安全技术，用于防止 App 遭受中间人攻击（MITM）或被抓包。它通过将服务器的证书或公钥“写死”在 App 中，在每次建立 HTTPS 连接时进行强制校验，只有校验通过才允许通信。正因如此，SSL Pinning 对 Android 上的代理抓包工具（如 Charles、Fiddler 等）构成了有效阻碍。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/04/24/SSL_Pinning%E5%88%9D%E8%AF%86/#more" rel="contents">
-                Read more &raquo;
-              </a>
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2025/04/25/%E5%A4%9A%E7%A7%8DSSL_Pinning%E6%A0%A1%E9%AA%8C%E9%80%BB%E8%BE%91/" rel="prev" title="多种SSL Pinning校验逻辑">
+                  <i class="fa fa-angle-left"></i> 多种SSL Pinning校验逻辑
+                </a>
             </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
   </article>
 </div>
+
 
 
 
