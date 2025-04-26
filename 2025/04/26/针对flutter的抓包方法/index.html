@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"jennie2hang.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.23.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。 flutter中的SSL PinningFlutter">
+    <meta name="description" content="Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="针对flutter的抓包方法">
 <meta property="og:url" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="Jennie&#39; Blog">
-<meta property="og:description" content="Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。 flutter中的SSL PinningFlutter">
+<meta property="og:description" content="Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426180918094.png">
 <meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250426221128513.png">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250427003154170.png">
 <meta property="og:image" content="https://jennie2hang.github.io/2025/04/26/%E9%92%88%E5%AF%B9flutter%E7%9A%84%E6%8A%93%E5%8C%85%E6%96%B9%E6%B3%95/image-20250427004129426.png">
 <meta property="article:published_time" content="2025-04-25T16:18:29.000Z">
-<meta property="article:modified_time" content="2025-04-26T16:41:45.161Z">
+<meta property="article:modified_time" content="2025-04-26T16:43:45.490Z">
 <meta property="article:author" content="piupiu">
 <meta property="article:tag" content="Android 协议">
 <meta property="article:tag" content="flutter">
@@ -223,7 +223,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2025-04-27 00:41:45" itemprop="dateModified" datetime="2025-04-27T00:41:45+08:00">2025-04-27</time>
+      <time title="Modified: 2025-04-27 00:43:45" itemprop="dateModified" datetime="2025-04-27T00:43:45+08:00">2025-04-27</time>
     </span>
 
   
@@ -236,6 +236,8 @@
     
     
     <div class="post-body" itemprop="articleBody"><p>Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。由于Dart使用Mozilla的NSS库生成并编译自己的Keystore，导致我们就不能通过将代理CA添加到系统CA存储来绕过SSL验证。为了解决这个问题，就必需要研究libflutter.so。</p>
+<span id="more"></span>
+
 <h2 id="flutter中的SSL-Pinning"><a href="#flutter中的SSL-Pinning" class="headerlink" title="flutter中的SSL Pinning"></a>flutter中的SSL Pinning</h2><p>Flutter是Google使用Dart语言开发的移动应用开发框架，使用一套Dart代码就能快速构建高性能、高保真的iOS和Android应用程序。在网络连接方面，Dart 并不会默认信任操作系统中已安装的根证书，它会使用Google的<a target="_blank" rel="noopener" href="https://github.com/google/boringssl">BoringSSL</a>来处理与SSL相关的所有内容。这使得在 Dart 中抓包 HTTPS 请求更加复杂，因为我们不能以将代理的证书（如 Charles 的根证书） 添加到系统证书的方式来绕过SSL验证。</p>
 <ol>
 <li><p><strong>Dart语言标准库的网络请求不走Wi-Fi代理</strong>：Flutter使用的是Dart语言，其标准库中的网络请求不会通过代理发送，这与许多其他应用不同。常规的抓包工具通常依赖于代理来捕获网络流量，因此无法捕获Flutter应用的网络请求。</p>
